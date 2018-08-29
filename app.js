@@ -6,6 +6,7 @@ import http from 'http';
 import bodyParser from 'body-parser';
 import users from './routes/users';
 import expressSession from 'express-session';
+import path from 'path';
 
 const app = express();
 
@@ -16,7 +17,9 @@ app.use(express.static(__dirname + '/src'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-
+app.use('*', function(req, res) {
+    res.sendFile(path.resolve(__dirname, 'src', 'index.html'));
+});
 
 if(!config.API_KEY){
     console.log("Please set your ACCOUNT_SECURITY_API_KEY environment variable before proceeding.");
@@ -66,7 +69,7 @@ app.use(
     )
 );
 
-app.use('/api/users', users);
+// app.use('/api/users', users);
 
 // http.createServer(app).listen(3000);
 
