@@ -5,7 +5,7 @@ import { Client } from 'authy-client';
 import qs from 'querystring';
 import request from 'request';
 
-const phoneReg = require('../lib/phone_verification')(config.API_KEY);
+const phoneReg = require('../lib/phoneVerification')(config.API_KEY);
 
 
 const authy = new Client ({ key : config.API_KEY });
@@ -362,6 +362,40 @@ export const verifyPhoneToken = (req, res) => {
         console.log('Failed in Confirm Phone request body: ', req.body);
         res.status(500).json({error: "Missing fields"});
     }
+}
+
+/**
+ * Request a Time-based One Time Password (TOTP) via a voice call
+ *
+ * @param req
+ * @param res
+ */
+export const voice = (req, res) => {
+    const username = req.session.username;
+    User.findOne({username: username}).exec(function (err, user) {
+        console.log("Send Voice");
+        if (err) {
+            console.log('ERROR SendVoice', err);
+            res.status(500).json(err);
+            return;
+        }
+
+        /**
+         * If the user has the Authy app installed, it'll send a text
+         * to open the Authy app to the TOTP token for this particular app.
+         *
+         * Passing force: true forces an voice call to be made
+         */
+        authy.requestCall({authyId: user.authyId}, {force: true}, function (err, callRes) {
+            if (err) {
+                console.error('ERROR requestcall', err);
+                res.status(500).json(err);
+                return;
+            }
+            console.log("requestCall response: ", callRes);
+            res.status(200).json(callRes);
+        });
+    });
 }
 
 /**
