@@ -8,6 +8,7 @@
   },
   "main": "app.js",
   "dependencies": {
+    "authy-client": "^1.1.1",
     "axios": "^0.16.2",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.2",
